@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom'
 import moment from 'moment'
 
 export default function GetQuestions(props){
+  console.log("Child Rendered");
   const [questions, setQuestions] = React.useState([]);
   const uri =process.env.REACT_APP_GRAPHQL_API;
   const query = gql`

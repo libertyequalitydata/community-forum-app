@@ -18,7 +18,6 @@ class Feed extends React.Component {
         modal: false,
         dropdownOpen: false,
         query: '',
-        created: true
 
     }
 
@@ -36,7 +35,6 @@ class Feed extends React.Component {
             body: this.state.body
         }
         createQuestion(data)
-
     }
 
     setViews = (questionid, ) => {
@@ -53,7 +51,7 @@ class Feed extends React.Component {
     }
 
 
-
+    
     
 
 

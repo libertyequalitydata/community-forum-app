@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from '../src/components/Navbar'
 import MainPage from '../src/components/MainPage'
 import QuestionPage from '../src/components/Question'
+import Login from '../src/components/Login'
+
 
 const StyledBox = styled.div`
   height: 100vh;
@@ -15,14 +17,14 @@ const StyledBox = styled.div`
 
 
 export const App = () => {
-
   return (
-    <BrowserRouter>
+    <BrowserRouter >
     <StyledBox role={"remote"}>
-          <Navbar />
+          <Navbar/>
           <div className="content">
           <Routes>
             <Route path="/" element={<MainPage />}/> 
+            <Route path="/login" element={<Login />}/> 
             <Route path="/question/:title/:questionid" element={<QuestionPage />}/>     
           </Routes>
           </div>

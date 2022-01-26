@@ -30,7 +30,7 @@ mutation publish($id: ID!) {
         const variables = {
           "date": moment().toISOString(),
           "body": props.body,
-          "account": props.accountID,
+          "account": localStorage.getItem('userID'),
           "question": props.questionID,
 
         }

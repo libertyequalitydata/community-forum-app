@@ -6,6 +6,7 @@ import { Row, Col,ListGroup,ListGroupItem,InputGroup, Input, Button, Form, } fro
 import CreateAnswer from './CreateAnswer';
 
 export default function Question({data}){
+    
     const {questionid} = useParams();
     const [question, setQuestion] = React.useState([]);
     const [answers, setAnswers] = React.useState([]);
@@ -21,7 +22,6 @@ export default function Question({data}){
     const createAnswer = (e) => {
       const data = {
         questionID: questionid,
-        accountID: "ckyn9h6vk07fp0b08kraoj3q5",
         body: response
       }
       CreateAnswer(data)
@@ -88,6 +88,7 @@ export default function Question({data}){
       };
 
     return(
+      
         <div>
           <h1>{question.title}</h1>
           <small className='float-left mt-4 text-break'>{moment(question.date).fromNow()} by {GetUser(question)}</small><br /><br />
