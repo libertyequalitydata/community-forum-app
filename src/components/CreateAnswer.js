@@ -6,9 +6,9 @@ export const CreateAnswer = async (props) => {
   const uri =process.env.REACT_APP_GRAPHQL_API;
 
 const mutationAnswer = gql`
-mutation MyMutation($body: String!, $question: ID!, $date: DateTime!, $account: ID!) {
+mutation MyMutation($body: String!, $question: ID!, $date: DateTime!, $account: String!) {
     createAnswer(
-      data: {description: $body, question: {connect: {id: $question}}, account: {connect: {id: $account}}, date: $date}
+      data: {description: $body, question: {connect: {id: $question}}, account: {connect: {username: $account}}, date: $date}
     ) {
       id
       date
@@ -30,7 +30,7 @@ mutation publish($id: ID!) {
         const variables = {
           "date": moment().toISOString(),
           "body": props.body,
-          "account": localStorage.getItem('userID'),
+          "account": props.accountID,
           "question": props.questionID,
 
         }

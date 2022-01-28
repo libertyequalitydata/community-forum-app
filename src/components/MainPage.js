@@ -8,7 +8,7 @@ class MainPage extends React.Component {
   state = {
     showFeed: true,
     showYellowPages: false,
-    showNews: false
+    showNews: false,
   }
   feedSelected = (e) => {
     this.setState({

@@ -11,7 +11,10 @@ import moment from 'moment'
 export default function GetQuestions(props){
   console.log("Child Rendered");
   const [questions, setQuestions] = React.useState([]);
+  // const [questionsFinal, setQuestionsFinal] = React.useState([]);
+  const [answers, setAnswers] = React.useState();
   const uri =process.env.REACT_APP_GRAPHQL_API;
+  
   const query = gql`
   {
       questions{
@@ -56,6 +59,16 @@ query GetQuestionsSearched($search: String!){
     }
   }
 `
+const queryAnswers = gql`
+query MyQuery($id: ID!) {
+  answersConnection(where: {question: {id: $id}}) {
+    aggregate {
+      count
+    }
+  }
+}
+
+`
   useEffect(()=> {
     const fetchData = async () => {
       if (props.query !== ''){
@@ -67,20 +80,25 @@ query GetQuestionsSearched($search: String!){
       } else {
   
         await request(uri, query).then((data) => setQuestions(data.questions))
+        // await request(uri, query).then((data) => console.log(data))
       }
-      console.log(props.query)
-      console.log(uri)
-      console.log(questions)
+        
+
+      
+      
     }
     fetchData().catch(console.error);;
+    console.log(questions)
+    
 
-  },[props]);
+  },[]);
   // console.log(uri);
+
 
 
   return(
 <div>
-  {questions.map(question=> (
+  {questions.map( (question)=> (
     
   <Row className='border mb-2' key={question.id}>
 
@@ -90,7 +108,7 @@ query GetQuestionsSearched($search: String!){
             <small className='pl-2'>Views</small>
         </Row>
         <Row className="5">
-            <small className='pl-2'>0</small>
+            <small className='pl-2'></small>
             <small className='pl-2'>Answers</small>
         </Row>
 

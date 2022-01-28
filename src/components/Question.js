@@ -1,9 +1,10 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useContext} from "react";
 import { useParams } from "react-router-dom";
 import { request, gql  } from 'graphql-request'
 import moment from 'moment'
 import { Row, Col,ListGroup,ListGroupItem,InputGroup, Input, Button, Form, } from 'reactstrap'
 import CreateAnswer from './CreateAnswer';
+import { AccountContext } from "./Account";
 
 export default function Question({data}){
     
@@ -11,6 +12,8 @@ export default function Question({data}){
     const [question, setQuestion] = React.useState([]);
     const [answers, setAnswers] = React.useState([]);
     const [response, setResponse] = React.useState([]);
+    
+    const {getUser} = useContext(AccountContext);
     const endpoint =process.env.REACT_APP_GRAPHQL_API;
     // const client = new GraphQLClient(uri)
     const variables = {
@@ -20,11 +23,15 @@ export default function Question({data}){
       setResponse(e.target.value);
     }
     const createAnswer = (e) => {
-      const data = {
-        questionID: questionid,
-        body: response
+      if (getUser() != null){
+        const data = {
+          questionID: questionid,
+          body: response,
+          accountID: getUser()
+        }
+        CreateAnswer(data)
       }
-      CreateAnswer(data)
+
     }
 
     const queryQuestion = gql`
