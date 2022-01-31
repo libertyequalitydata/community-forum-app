@@ -88,40 +88,98 @@
 import React, {useContext, useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import { AccountContext } from "./Account";
+import {CircularProgress, Alert, AlertIcon, AlertTitle, AlertDescription,CloseButton, Box, FormControl, FormLabel, FormErrorMessage, FormHelperText, Input, Button} from '@chakra-ui/react';
 
-const Login = () => {
+
+const Login = (props) => {
     const [password, setPassword] = useState("")
     const [username, setUsername] = useState("")
+    const [error, setError] = useState({})
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate();
     const {authenticate} = useContext(AccountContext);
+    const loginerror = error.name === 'NotAuthorizedException' 
     const onSubmit = (event) => {
+        
         event.preventDefault();
+        setIsLoading(true)
         authenticate(username, password).then(data => {
           console.log("Logged In!", data);
+          setIsLoading(false)
           navigate('/')
         }).catch((err)=> {
-          console.log("Failed to login", err);
+            setError(err)
+            setIsLoading(false)
+            console.log(error.name)
+        //   console.log("Failed to login", err);
         })
+    };
+    const close = ()=> {
+        setError({})
     };
 
     return (
-        <div>
-            <form onSubmit={onSubmit}>
-                <label>Username:</label>
-                <input
-                value={username}
-                onChange={(event)=> setUsername(event.target.value)}
-                ></input>
-                <label>Password:</label>
-                <input
-                value={password}
-                onChange={(event)=> setPassword(event.target.value)}
-                type="password"
-                ></input>
+        // <div>
+        //     <form onSubmit={onSubmit}>
+        //         <label>Username:</label>
+        //         <input
+        //         value={username}
+        //         onChange={(event)=> setUsername(event.target.value)}
+        //         ></input>
+        //         <label>Password:</label>
+        //         <input
+        //         value={password}
+        //         onChange={(event)=> setPassword(event.target.value)}
+        //         type="password"
+        //         ></input>
 
-                <button type="submit">Login</button>
-            </form>
-        </div>
+        //         <button type="submit">Login</button>
+        //     </form>
+        // </div>
+                <Box>
+                <form onSubmit={onSubmit}>
+                    <FormControl isRequired>
+                        <FormLabel htmlFor="username">Username</FormLabel>
+                        <Input value={username} onChange={(event)=> setUsername(event.target.value)}  placeholder="example" />
+                        <FormHelperText>
+                        Enter your username
+                        </FormHelperText>
+                    </FormControl>
+                    <FormControl isRequired>
+                            
+                        <FormLabel htmlFor="passowrd">Password</FormLabel>
+                        <Input value={password} type="password" onChange={(event)=> setPassword(event.target.value)} placeholder="*************" />
+                        <FormHelperText>
+                        Enter your password
+                        </FormHelperText>
+                        
+                    </FormControl>
+                            <Button
+                                mt={4}
+                                colorScheme='teal'
+                                type='submit'
+    
+                            >
+                                {isLoading ? (
+                                    <CircularProgress isIndeterminate size="24px" color="teal" />
+                                ) : (
+                                    'Sign In'
+                                )
+                                }
+                            </Button>
+                </form>
+                {loginerror ?(
+                                    <Alert status='error'>
+                                    <AlertIcon />
+                                    <AlertTitle mr={2}>There was a problem logging in!</AlertTitle>
+                                    <AlertDescription>{error.message}</AlertDescription>
+                                    <CloseButton as="button" position='absolute' right='8px' top='8px' onClick={close}/>
+                                    </Alert>
+                ) : (
+                    <br/>
+                )
+                }
+            </Box>
 
     );
 };
