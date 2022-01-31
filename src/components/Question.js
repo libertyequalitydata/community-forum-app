@@ -4,6 +4,8 @@ import { request, gql  } from 'graphql-request'
 import moment from 'moment'
 import { Row, Col,ListGroup,ListGroupItem,InputGroup, Input, Button, Form, } from 'reactstrap'
 import CreateAnswer from './CreateAnswer';
+import VoteQuestion from "./VoteQuestion";
+import VoteAnswer from "./VoteAnswer";
 import { AccountContext } from "./Account";
 
 export default function Question({data}){
@@ -13,7 +15,10 @@ export default function Question({data}){
     const [answers, setAnswers] = React.useState([]);
     const [response, setResponse] = React.useState([]);
     
+    
     const {getUser} = useContext(AccountContext);
+
+  
     const endpoint =process.env.REACT_APP_GRAPHQL_API;
     // const client = new GraphQLClient(uri)
     const variables = {
@@ -44,6 +49,9 @@ export default function Question({data}){
           id
         }
         upvotes {
+          id
+        }
+        downvotes {
           id
         }
         account{
@@ -93,11 +101,75 @@ export default function Question({data}){
         return newText
       }
       };
+    
+    const getVotes = () => {
+      if (question.upvotes != undefined){
+        return question.upvotes.length-question.downvotes.length
+      }
+    }
+
+    // const upvote = (data) => {
+    //   const data2 = {
+    //     "id": data,
+    //     "vote": "upvote"
+    //   }
+    //   if (data === question.id){
+    //     VoteQuestion(data2)
+    //   } else {
+
+    //   }
+    // }
+
+    // const downvote = (data) => {
+    //   const data2 = {
+    //     "id": data,
+    //     "vote": "downvote"
+    //   }
+    //   if (data === question.id){
+    //     VoteQuestion(data2)
+    //   } else {
+
+    //   }
+    // }
+
+    function upvote(id){
+      const data = {
+        "id": id,
+        "vote": "upvote",
+        "username": getUser()
+      }
+      if (id === question.id){
+        VoteQuestion(data)
+        
+      } else {
+        VoteAnswer(data)
+      }
+      
+    }
+
+    function downvote(id){
+      const data = {
+        "id": id,
+        "vote": "downvote",
+        "username": getUser()
+      }
+      if (id === question.id){
+        VoteQuestion(data)
+      } else {
+        VoteAnswer(data)
+      }
+    }
 
     return(
       
         <div>
           <h1>{question.title}</h1>
+          <small className='pl-2'>{getVotes()}</small>          
+          <small className='pl-2'>Votes</small>
+          <br/>
+          <button onClick={()=>upvote(question.id)}>Upvote</button>
+          <button onClick={()=>downvote(question.id)}>Downvote</button>
+          <br/>
           <small className='float-left mt-4 text-break'>{moment(question.date).fromNow()} by {GetUser(question)}</small><br /><br />
           {Multiline(question.description)}
           {answers.map(answer=> (
@@ -106,8 +178,13 @@ export default function Question({data}){
     
     <Col xs='3' className='my-auto mx-auto'>    
         <Row className="5">
-            <small className='pl-2'>{answer.upvotes.length+answer.downvotes.length}</small>
+            <small className='pl-2'>{answer.upvotes.length-answer.downvotes.length}</small>
             <small className='pl-2'>Votes</small>
+            
+          <br/>
+          <button onClick={()=>upvote(answer.id)}>Upvote</button>
+          <button onClick={()=>downvote(answer.id)}>Downvote</button>
+          <br/>
         </Row>
     
     
