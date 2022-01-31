@@ -19,7 +19,7 @@ const Navbar=() => {
 
         <Flex>
           <Box p='2'>
-            <Heading size='md' ><Link href="/" >Test Nav Bar</Link></Heading>
+            <Heading size='md' as='button' onClick={toHome} >Test Nav Bar</Heading>
           </Box>
           <Spacer />
           <Status/>

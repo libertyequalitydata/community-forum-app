@@ -1,25 +1,35 @@
 import React, {useState} from "react";
 import UserPool from "../UserPool";
 import { useNavigate } from 'react-router-dom';
-import {Form, Box, FormControl, FormLabel, FormErrorMessage, FormHelperText, Input, Button} from '@chakra-ui/react';
+import {CircularProgress, Alert, AlertIcon, AlertTitle, AlertDescription,CloseButton, Box, FormControl, FormLabel, FormErrorMessage, FormHelperText, Input, Button} from '@chakra-ui/react';
 
 const Signup = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [username, setUsername] = useState("")
-    const [error, setError] = useState("")
+    const [error, setError] = useState({name: ''})
+    
+    const [isLoading, setIsLoading] = useState(false)
+    
+    const signuperror = error.name !== '' 
     const isError = email === ''
     const dataEmail = {
         Name: 'email',
         Value: email 
     }
     const navigate = useNavigate();
+    
+    const close = ()=> {
+        setError({name: ''})
+    };
     const onSubmit = (event) => {
         event.preventDefault();
+        setIsLoading(true)
         
         UserPool.signUp(username, password, [dataEmail], null, (err,data) => {
             if (err) {
-                setError(err.name)
+                
+                setError(err)
                 console.log(err);
                 if (err.name == "InvalidParameterException"){
                     if (err.message.includes('Member must satisfy regular expression pattern')){
@@ -39,33 +49,13 @@ const Signup = () => {
                 
                 navigate(-1)
             }
-            
+            setIsLoading(false)
 
         });
     };
 
     return (
         <Box>
-            {/* <form onSubmit={onSubmit}>
-                <label>Username:</label>
-                <input
-                value={username}
-                onChange={(event)=> setUsername(event.target.value)}
-                ></input>
-                <label>Email:</label>
-                <input
-                value={email}
-                onChange={(event)=> setEmail(event.target.value)}
-                ></input>
-                <label>Password:</label>
-                <input
-                value={password}
-                onChange={(event)=> setPassword(event.target.value)}
-                type="password"
-                ></input>
-
-                <button type="submit">Signup</button>
-            </form> */}
             <form onSubmit={onSubmit}>
                 <FormControl isRequired>
                     <FormLabel htmlFor="username">Username</FormLabel>
@@ -98,9 +88,25 @@ const Signup = () => {
                             type='submit'
 
                         >
-                            Submit
+                                {isLoading ? (
+                                    <CircularProgress isIndeterminate size="24px" color="teal" />
+                                ) : (
+                                    'Sign Up'
+                                )
+                                }
                         </Button>
             </form>
+            {signuperror ?(
+                                    <Alert status='error'>
+                                    <AlertIcon />
+                                    <AlertTitle mr={2}>There was a problem signing up!</AlertTitle>
+                                    <AlertDescription>{error.message}</AlertDescription>
+                                    <CloseButton as="button" position='absolute' right='8px' top='8px' onClick={close}/>
+                                    </Alert>
+                ) : (
+                    <br/>
+                )
+                }
 
         </Box>
 
