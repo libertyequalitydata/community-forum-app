@@ -1,9 +1,10 @@
 import React, {useContext} from 'react';
 import {
-    Row, Col, InputGroup, Input, Button, Form,
-    ListGroupItem, Container, Modal, ModalHeader, ModalBody, ModalFooter,
+    Row, Col, InputGroup, Input, Form,
+    ListGroupItem, Container
 
 } from 'reactstrap';
+import {Textarea , Spacer, Button, Modal, ModalOverlay, ModalContent,ModalHeader,ModalFooter,ModalBody,ModalCloseButton,useDisclosure} from '@chakra-ui/react'
 import GetQuestions from './GetQuestions';
 import createQuestion from './CreateQuestion';
 
@@ -141,6 +142,7 @@ const Feed = () => {
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [query, setQuery] = React.useState('');
     const {getUser} = useContext(AccountContext);
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
     
     const submitQuestion = e => {
@@ -181,10 +183,12 @@ const Feed = () => {
 
 
                         <div>
-                            <Button onClick={(event) => toggleModal(event)} className='ml-auto btn-sm' outline color="secondary">Ask Question</Button>
-                            <Modal isOpen={modal} toggle={(event) => toggleModal(event)}>
-                                <ModalHeader toggle={(event) => toggleModal(event)}>Ask Question</ModalHeader>
-                                <ModalBody>
+                            <Button onClick={onOpen} className='ml-auto btn-sm' outline color="secondary">Ask Question</Button>
+                            <Modal isOpen={isOpen} onClose={onClose}>
+                                <ModalOverlay/>
+                                <ModalContent>
+                                    <ModalHeader>Ask Question</ModalHeader>
+                                    <ModalBody>
                                     <ListGroupItem>
                                         Make sure your question hasn't been asked already
                                     </ListGroupItem>
@@ -209,10 +213,18 @@ const Feed = () => {
 
 
                                 </ModalBody>
+                                
+                                {/* <Flex> */}
                                 <ModalFooter>
-                                    <Button onClick={(event) => submitQuestion(event)} outline color="success">Ask</Button>{''}
-                                    <Button onClick={(event) => toggleModal(event)} outline color="danger">Cancel</Button>
+                                {/* <Spacer/> */}
+                                    <Button onClick={(event) => submitQuestion(event)} colorScheme="green" >Ask</Button>{''}
+                                    <Spacer/>
+                                    <Button onClick={onClose} colorScheme="red">Cancel</Button>
+                                    
                                 </ModalFooter>
+                                {/* </Flex> */}
+                                </ModalContent>
+                                
                             </Modal>
                         </div>
                         <div className='mx-auto container-fluid my-1'>
