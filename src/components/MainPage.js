@@ -5,6 +5,7 @@ import {
 import Feed from './Feed';
 
 class MainPage extends React.Component {
+    
   state = {
     showFeed: true,
     showYellowPages: false,
@@ -42,6 +43,7 @@ showNews = (e) => {
     
 }
 render() {
+    // console.log("Main Page Render")
   return (
       <div>
           <Container>
@@ -80,9 +82,9 @@ render() {
 
 
  
-              {this.state.showFeed && (
+              {/* {this.state.showFeed && ( */}
                   <Feed />
-              )}
+
 
 {/*
 

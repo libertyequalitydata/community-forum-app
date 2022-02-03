@@ -78,7 +78,7 @@ mutation publish($id: ID!) {
       await request(uri, disconnectUpvote, variables, requestHeaders)       
     if (props.vote === "upvote"){
       
-      await request(uri, mutationUpvote, variables, requestHeaders).then((data)=>{console.log(data)})
+      await request(uri, mutationUpvote, variables, requestHeaders)
     } else if (props.vote === "downvote"){
       
       await request(uri, mutationDownvote, variables, requestHeaders)
@@ -86,7 +86,7 @@ mutation publish($id: ID!) {
     const variables2 = {
       "id": props.id
     }
-    await request(uri, publishQuestion, variables2, requestHeaders)
+    await request(uri, publishQuestion, variables2, requestHeaders).then((data)=>{console.log(data)})
     }
       return(
         vote()

@@ -2,7 +2,7 @@ import { request, gql } from 'graphql-request'
 
 
 
-function VoteAnswer(props){
+async function VoteAnswer(props){
   const uri =process.env.REACT_APP_GRAPHQL_API;
   const disconnectUpvote = gql`
   mutation upvoteAnswer($id: ID!, $username: String!) {
@@ -77,7 +77,7 @@ mutation publish($id: ID!) {
       await request(uri, disconnectUpvote, variables, requestHeaders)       
     if (props.vote === "upvote"){
       
-      await request(uri, mutationUpvote, variables, requestHeaders).then((data)=>{console.log(data)})
+      await request(uri, mutationUpvote, variables, requestHeaders)
     } else if (props.vote === "downvote"){
       
       await request(uri, mutationDownvote, variables, requestHeaders)
