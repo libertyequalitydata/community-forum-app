@@ -133,7 +133,10 @@ export default function Question({data}){
         // console.log(votes)
         
         // console.log(votes)
-        var userID = await GetUserID(getUser())
+        if (getUser()!==null){
+          var userID = await GetUserID(getUser())
+        }
+        
         // let test1  = await request(endpoint, queryQuestion, variables).then((data) => setQuestion(data.question))
         // let test2 = await request(endpoint, queryAnswers, variables).then((data) => setAnswers(data.answers))
         // let test1  = await request(endpoint, queryQuestion, variables)
@@ -214,8 +217,7 @@ export default function Question({data}){
         // console.log(answers)
         setQuestion(question)
         setAnswers(answers)
-
-        console.log(userID)
+        if (getUser()!==null){
         if (question.upvotes.some(e => e.id === userID)) {
           
           // if (votes===null){
@@ -255,7 +257,9 @@ export default function Question({data}){
             }
             
           });
+          
           setVotes(votes)
+        }
           console.log(votes)
 
 
@@ -518,7 +522,7 @@ export default function Question({data}){
 
     const disabled = (id, type) => {
       const key = id + type
-      if (key !== isLoading && isLoading !== ""){
+      if ((key !== isLoading && isLoading !== "")||getUser()===null){
         return true
       } else {
         return false
@@ -576,7 +580,7 @@ export default function Question({data}){
           </Box>
         </Flex>
         {answers.map(answer=> (
-                  <Box borderWidth='3px' borderRadius='lg' >
+                  <Box borderWidth='3px' borderRadius='lg' key={answer.id} >
                   <Flex>
                     <Box >
                     <IconButton
