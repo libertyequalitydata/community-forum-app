@@ -1,32 +1,41 @@
 import React, {useEffect, useContext, useCallback} from "react";
 import { useParams } from "react-router-dom";
 import { request, gql  } from 'graphql-request'
+import { useNavigate } from 'react-router-dom';
 
 import moment from 'moment'
 // import { Row, Col,ListGroup,ListGroupItem,InputGroup, Input, Button, Form, } from 'reactstrap'
 import CreateAnswer from './CreateAnswer';
+import DeleteAnswer from './DeleteAnswer';
+import DeleteQuestion from './DeleteQuestion';
 import VoteQuestion from "./VoteQuestion";
 import VoteAnswer from "./VoteAnswer";
 import GetUserID from "./GetUserID";
 import { AccountContext } from "./Account";
-import {   FormControl,
-  FormLabel, IconButton,
+import {   FormControl,useDisclosure,
+  FormLabel, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
   FormErrorMessage,
   FormHelperText, Divider, Textarea , Button, Link, Text, Flex, Spacer, Box } from '@chakra-ui/react'
 import {BiDownArrow, BiUpArrow} from "react-icons/bi"
+import {RiContactsBookLine, RiDeleteBack2Fill} from "react-icons/ri"
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 
 
 export default function Question({data}){
     
     const {questionid} = useParams();
+    const [id, setID] = React.useState("");
     const [question, setQuestion] = React.useState([]);
     const [answers, setAnswers] = React.useState([]);
     const [response, setResponse] = React.useState([]);
     const [vote, setVote] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState("")
     const [votes, setVotes] = React.useState([])
+    const [userID, setUserID] = React.useState("")
     const axios = require("axios");
     const [submit, setSubmit] = React.useState(false)
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    let navigate = useNavigate();
     
     const {getUser} = useContext(AccountContext);
 
@@ -40,7 +49,8 @@ export default function Question({data}){
       setResponse(e.target.value);
     }
     const createAnswer = async (e) => {
-      if (getUser() != null){
+      setIsLoading("response")
+      if (getUser() != null&&response!==""){
         const data = {
           questionID: questionid,
           body: response,
@@ -48,7 +58,9 @@ export default function Question({data}){
         }
        await CreateAnswer(data)
       }
+      setResponse("")
       setSubmit(!submit)
+      setIsLoading("")
 
     }
 
@@ -135,6 +147,7 @@ export default function Question({data}){
         // console.log(votes)
         if (getUser()!==null){
           var userID = await GetUserID(getUser())
+          setUserID(userID)
         }
         
         // let test1  = await request(endpoint, queryQuestion, variables).then((data) => setQuestion(data.question))
@@ -520,14 +533,75 @@ export default function Question({data}){
       }
     }
 
-    const disabled = (id, type) => {
-      const key = id + type
-      if ((key !== isLoading && isLoading !== "")||getUser()===null){
+    const disabled = (obj, type) => {
+      console.log(getUser())
+      if (getUser()==null){
         return true
+      }
+      if (obj!==undefined&&obj.account!==undefined){
+        if (typeof obj === "object") {
+          // console.log(obj.account.username)
+          if (obj.account.username !== getUser()){
+            return true
+          } else {
+            return false
+          }
+          
+  
+        } else {
+          const key = obj + type
+          // console.log(getUser())
+          if ((key !== isLoading && isLoading !== "")){
+            return true
+          } else {
+            return false
+          }
+  
+        }
+
       } else {
         return false
       }
+      
+      // if (obj.id !== undefined){
+      //   console.log(obj)
+      // }
+
+
     }
+
+    const deleteEntity = async (id) => {
+      setIsLoading(id+"delete")
+      
+
+      if (id === question.id){
+        
+        await DeleteQuestion(id)     
+        navigate('/')          
+     } else {
+         await DeleteAnswer(id)
+         
+          setVote(!vote)       
+     }
+     onClose()
+     setIsLoading("")
+
+    }
+
+    const openModal = (id) => {
+      setID(id)
+      onOpen()
+
+    }
+
+
+    const closeModal = () => {
+      setID("")
+      onClose()
+
+
+    }
+
     const activate = (id, type) => {
       const key = id + type
       // console.log(key)
@@ -573,10 +647,45 @@ export default function Question({data}){
           </Box>
           {/* Title */}
           <Box>
-            <Text fontSize="xl">{question.title}</Text>
+            <Text fontSize="xl" fontWeight="semibold">{question.title}</Text>
             <Text fontSize="xs">{moment(question.date).fromNow()} by {GetUser(question)}</Text>
             <Text>{Multiline(question.description)}</Text>
 
+          </Box>
+          <Spacer/>
+          <Box>
+            <br/>
+            <IconButton
+                      variant='outline'
+                      colorScheme='red'
+                      aria-label='Call Sage'
+                      fontSize='20px'
+                      isDisabled={disabled(question, "delete")}
+                      onClick={()=>{openModal(question.id)}}
+                      icon={<RiDeleteBack2Fill />}
+                      
+                    />
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+          <Text>Are you sure you want to delete this?</Text>
+          </ModalBody>
+          
+          <ModalFooter>
+            <Button colorScheme='red' mr={3} onClick={()=>{deleteEntity(id)}} isLoading={loading(id, "delete")}>
+              Delete
+            </Button>
+            <Spacer/>
+            <Button colorScheme='blue' mr={3} onClick={()=>{closeModal()}} isDisabled={disabled()}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+            
           </Box>
         </Flex>
         {answers.map(answer=> (
@@ -612,6 +721,20 @@ export default function Question({data}){
                       <Text>{Multiline(answer.description)}</Text>
                       <Text fontSize="xs">{moment(answer.date).fromNow()} by {GetUser(answer)}</Text>
                     </Box>
+                    <Spacer/>
+          <Box>
+            <br/>
+            <IconButton
+                      variant='outline'
+                      colorScheme='red'
+                      aria-label='Call Sage'
+                      fontSize='20px'
+                      isDisabled={disabled(answer, "delete")}
+                      onClick={()=>{openModal(answer.id)}}
+                      icon={<RiDeleteBack2Fill />}
+                      
+                    />
+                    </Box>
                     
                   </Flex>
                 </Box>
@@ -622,61 +745,13 @@ export default function Question({data}){
             <FormControl>
                <br/>
                <Textarea placeholder='Test' name='body' value={response} onChange={fillAnswer}></Textarea>
-             <Button onClick={createAnswer} outline color="success">Reply</Button>{''}
+             <Button onClick={()=>{createAnswer()}} outline color="success" isLoading={loading("response", "")} isDisabled={disabled("response","")}>Reply</Button>{''}
            </FormControl>
 
 
       </Box>
 
-      
-  //       <div>
-  //         <h1>{question.title}</h1>
-  //         <small className='pl-2'>{getVotes()}</small>          
-  //         <small className='pl-2'>Votes</small>
-  //         <br/>
-  //         <button onClick={()=>upvote(question.id)}>Upvote</button>
-  //         <button onClick={()=>downvote(question.id)}>Downvote</button>
-  //         <br/>
-  //         <small className='float-left mt-4 text-break'>{moment(question.date).fromNow()} by {GetUser(question)}</small><br /><br />
-  //         {Multiline(question.description)}
-  //         {answers.map(answer=> (
-    
-  //   <Row className='border mb-2' key={answer.id}>
-    
-  //   <Col xs='3' className='my-auto mx-auto'>    
-  //       <Row className="5">
-  //           <small className='pl-2'>{answer.upvotes.length-answer.downvotes.length}</small>
-  //           <small className='pl-2'>Votes</small>
-            
-  //         <br/>
-  //         <button onClick={()=>upvote(answer.id)}>Upvote</button>
-  //         <button onClick={()=>downvote(answer.id)}>Downvote</button>
-  //         <br/>
-  //       </Row>
-    
-    
-  //   </Col>
-  //   <Col >
-  //     <ListGroup className='text-left '>
-  //       <ListGroupItem className='border-0 text-break'>
-  //         <Row>
-  //           <small className='pl-3'>{moment(answer.date).fromNow()} by {GetUser(answer)}</small>
-  //           {Multiline(answer.description)}
-  //         </Row>
-  //       </ListGroupItem>
-  //     </ListGroup>
 
-  //   </Col>
-  // </Row>
-  //     ))}
-  //         <Form>
-  //             <InputGroup className='my-2 mt-3'>
-  //             <br/>
-  //             <textarea placeholder='Test' name='body' value={response} onChange={fillAnswer}></textarea>
-  //           </InputGroup>
-  //           <Button onClick={createAnswer} outline color="success">Reply</Button>{''}
-  //         </Form>
-  //       </div>
     )
 
 }

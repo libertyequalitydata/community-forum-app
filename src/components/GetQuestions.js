@@ -239,9 +239,9 @@ const headers = {
             } Answers</Text>
           <Text>{question.upvotes.length+question.downvotes.length} Votes</Text>
         </Box>
-        <Spacer />
+        {/* <Spacer /> */}
         <Box >
-          <Text align="start" fontSize='xl' color="blue"><Link align="end" as={ReactLink} to={`/question/${question.title.replace(/[^A-Z0-9]+/ig, "-")}/${question.id}`}>{question.title} </Link></Text>
+          <Text align="start" fontWeight="semibold" fontSize='xl' ><Link align="end" as={ReactLink} to={`/question/${question.title.replace(/[^A-Z0-9]+/ig, "-")}/${question.id}`}>{question.title} </Link></Text>
           <Text align="start">{moment(question.date).fromNow()} by {question.account.username}</Text>
         </Box>
         
